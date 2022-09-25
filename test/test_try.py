@@ -27,7 +27,7 @@ def guess_key(encrypted_text, key_size) -> dict:
 
     while len(key_str) <= key_size and englishFreqMatchScore(decrypted) < 12:
         guessAttempts = guessAttempts + 1
-        key = next(key)
+        key = next(key, key_size)
         key_str = ''.join(key)
         decrypted = xor_decrypt(encrypted_text, key)
         if englishFreqMatchScore(decrypted) > 10:
@@ -45,42 +45,26 @@ def indexToCharacter(index) -> list:
     else:
         return ALLOWED_CHARACTERS[index]
 
-def next(key) -> list:
-    """ Get next sequence of characters.
-    Treats characters as numbers (0-255). Function tries to increment
-    character at the first position. If it fails, new character is
-    added to the back of the list.
-    It's basically a number with base = 256.
-    :param string: A list of characters (can be empty).
-    :type string: list
-    :return: Next list of characters in the sequence
-    :rettype: list
-    """
+def next(key, key_size) -> list:
     if len(key) <= 0:
-        for i in range(3):
+        for _ in range(key_size):
             key.append(indexToCharacter(0))
     else:
         key[0] = indexToCharacter((characterToIndex(key[0]) + 1) % NUMBER_OF_CHARACTERS)
-        if characterToIndex(key[0]) is 0:
-            return list(key[0]) + next(key[1:])
+        if characterToIndex(key[0]) == 0:
+            return list(key[0]) + next(key[1:], key_size)
     return key
 
 def count_letters(text) -> int:
       result = {}
-      # Go through each letter in the text
       for letter in text:
-        # Check if the letter needs to be counted or not
         if letter not in result:
           result[letter.lower()] = 1
-        # Add or increment the value in the dictionary
         else:
           result[letter.lower()] += 1
       return result
 
 def getLetterCount(message) -> int:
-
-    # Returns a dictionary with keys of single letters and values of the    
-    # count of how many times they appear in the message parameter. 
     letterCount = {'A': 0, 'B': 0, 'C': 0, 'D': 0, 'E': 0, 'F': 0, 'G': 0,
                 'H': 0, 'I': 0, 'J': 0, 'K': 0, 'L': 0, 'M': 0, 'N': 0, 'O': 0,
                 'P': 0, 'Q': 0, 'R': 0, 'S': 0, 'T': 0, 'U': 0, 'V': 0, 'W': 0,
@@ -96,14 +80,7 @@ def getItemAtIndexZero(x):
     return x[0]
 
 def getFrequencyOrder(message) -> str: 
-    # Returns a string of the alphabet letters arranged in order of most    
-    # frequently occurring in the message parameter.    
-
-    # first, get a dictionary of each letter and its frequency count    
     letterToFreq = getLetterCount(message)  
-
-    # second, make a dictionary of each frequency count to each letter(s)   
-    # with that frequency   
     freqToLetter = {}   
     for letter in LETTERS:  
         if letterToFreq[letter] not in freqToLetter:    
@@ -111,19 +88,13 @@ def getFrequencyOrder(message) -> str:
         else:   
             freqToLetter[letterToFreq[letter]].append(letter)   
 
-    # third, put each list of letters in reverse "ETAOIN" order, and then   
-    # convert it to a string    
     for freq in freqToLetter:   
         freqToLetter[freq].sort(key=ETAOIN.find, reverse=True)  
         freqToLetter[freq] = ''.join(freqToLetter[freq])    
 
-    # fourth, convert the freqToLetter dictionary to a list of tuple    
-    # pairs (key, value), then sort them    
     freqPairs = list(freqToLetter.items())  
     freqPairs.sort(key=getItemAtIndexZero, reverse=True)    
 
-    # fifth, now that the letters are ordered by frequency, extract all 
-    # the letters for the final string  
     freqOrder = []  
     for freqPair in freqPairs:  
         freqOrder.append(freqPair[1])   
@@ -131,20 +102,11 @@ def getFrequencyOrder(message) -> str:
     return ''.join(freqOrder)
 
 def englishFreqMatchScore(message) -> int:
-
-    # Return the number of matches that the string in the message   
-    # parameter has when its letter frequency is compared to English    
-    # letter frequency. A "match" is how many of its six most frequent  
-    # and six least frequent letters is among the six most frequent and 
-    # six least frequent letters for English.   
     freqOrder = getFrequencyOrder(message)  
-
     matchScore = 0  
-    # Find how many matches for the six most common letters there are.  
     for commonLetter in ETAOIN[:6]: 
         if commonLetter in freqOrder[:6]:   
             matchScore += 1 
-    # Find how many matches for the six least common letters there are. 
     for uncommonLetter in ETAOIN[-6:]:  
         if uncommonLetter in freqOrder[-6:]:    
             matchScore += 1 
