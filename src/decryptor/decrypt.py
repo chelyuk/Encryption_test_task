@@ -5,6 +5,7 @@ from validator.validate_englist_text import englishFreqMatchScore, next
 
 
 MAX_MARK_FOR_TEXT_MATCHING_ENGLISH = 12
+GOOD_ENOUGH = 10
 
 def xor_decrypt(data, key):
     return ''.join([chr(ord(a) ^ ord(b)) for a,b in zip(data, cycle(key))])
@@ -21,7 +22,7 @@ def guess_key(encrypted_text, key_size):
         key = next(key, key_size)
         key_str = ''.join(key)
         decrypted = xor_decrypt(encrypted_text, key)
-        if englishFreqMatchScore(decrypted) > 10:
+        if englishFreqMatchScore(decrypted) > GOOD_ENOUGH:
             print("Password guessed successfully!")
             print("It took the computer %s guesses to guess your password." % (guessAttempts))
             res = {key_str: decrypted}
