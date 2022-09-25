@@ -1,7 +1,7 @@
 import numpy as np
 
 from itertools import cycle
-from validate_englist_text import englishFreqMatchScore, next
+from validator.validate_englist_text import englishFreqMatchScore, next
 
 
 MAX_MARK_FOR_TEXT_MATCHING_ENGLISH = 12

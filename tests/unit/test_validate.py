@@ -1,6 +1,6 @@
 import pytest
 
-from decryptor.validate_englist_text import characterToIndex, indexToCharacter, next, count_letters, englishFreqMatchScore
+from validator.validate_englist_text import characterToIndex, indexToCharacter, next, count_letters, englishFreqMatchScore
 
 
 @pytest.mark.parametrize('int, char',
